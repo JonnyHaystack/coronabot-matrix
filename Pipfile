@@ -1,0 +1,21 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+pylint = "*"
+black = "==19.10b0"
+jedi = "*"
+
+[packages]
+matrix-nio = "*"
+python-dotenv = "*"
+requests = "*"
+pycountry = "*"
+emoji-country-flag = "*"
+markdown = "*"
+jinja2 = "*"
+
+[requires]
+python_version = "3.8"
