@@ -1,0 +1,25 @@
+<p>
+  {% if country_info %}
+    {{ country_info["country_code"]|flag }}
+    <b>{{ country_info["country_name"] }}</b>
+  {% else %}
+    <b>Global stats</b>
+  {% endif %}
+  ({{ last_updated|datetimeformat }})
+</p>
+<table>
+  {% for key, value in stats.items() %}
+  <tr>
+    <td>
+    {{ key }}:
+    </td>
+    <td>
+    {% if value is mapping %}
+      {{ value["total"] }} (+{{ value["new"] }})
+    {% else %}
+      {{ value }}
+    {% endif %}
+    </td>
+  </tr>
+  {% endfor %}
+</table>

@@ -3,8 +3,6 @@ import shlex
 from datetime import datetime
 from json import JSONDecodeError
 
-from flag import flagize
-from markdown import markdown
 from nio import AsyncClient
 from nio import RoomMessageText
 
@@ -37,7 +35,6 @@ class Bot:
                 await self.command_handlers[command](room, event)
 
     async def send_message(self, room, message):
-        message_markdown = markdown(message, extensions=["nl2br"])
         await self.client.room_send(
             room_id=room.room_id,
             message_type="m.room.message",
@@ -45,7 +42,7 @@ class Bot:
                 "msgtype": "m.text",
                 "format": "org.matrix.custom.html",
                 "body": message,
-                "formatted_body": message_markdown,
+                "formatted_body": message,
             },
         )
 
@@ -55,22 +52,17 @@ class Bot:
     async def cbstats(self, room, event):
         args = event.body.split(" ")[1:]
         message = ""
+        country_info = None
         try:
             if len(args) == 0:
                 stats, updated = data.get_global_cases()
-                message = "**Global stats** "
             else:
                 country = " ".join(args)
                 stats, country_info, updated = data.get_country_cases(country)
-                message = flagize(
-                    f":{country_info['country_code']}: "
-                    f"**{country_info['country_name']}** "
-                )
-            last_updated = datetime.fromtimestamp(
-                int(updated) / 1000
-            ).strftime("%Y-%m-%d %H:%M")
-            message += f"({last_updated})\n"
-            message += formatting.format_stats(stats)
+            last_updated = datetime.fromtimestamp(int(updated) / 1000)
+            message = formatting.format_stats(
+                stats, country_info, last_updated
+            )
         except JSONDecodeError:
             if country is not None:
                 message = f"{country} doesn't exist lmao"
