@@ -1,25 +1,33 @@
 <p>
-  {% if country_info %}
-    {{ country_info["country_code"]|flag }}
-    <b>{{ country_info["country_name"] }}</b>
-  {% else %}
-    <b>Global stats</b>
-  {% endif %}
+{% if country_info %}
+  {{ country_info["country_code"]|flag }}
+  <b>{{ country_info["country_name"] }}</b>
+{% else %}
+  <b>Global stats</b>
+{% endif %}
   ({{ last_updated|datetimeformat }})
 </p>
 <table>
-  {% for key, value in stats.items() %}
+  <th>Statistic</th>
+  <th>Total</th>
+  <th>Today</th>
+{% for key, value in stats.items() %}
   <tr>
+    <td>{{ key }}</td>
     <td>
-    {{ key }}:
+  {% if value is mapping %}
+      {{ value["total"] }}
+  {% else %}
+      {{ value }}
+  {% endif %}
     </td>
     <td>
-    {% if value is mapping %}
-      {{ value["total"] }} (+{{ value["new"] }})
-    {% else %}
-      {{ value }}
-    {% endif %}
+  {% if value is mapping %}
+      {{ value["new"] }}
+  {% else %}
+      Unknown
+  {% endif %}
     </td>
   </tr>
-  {% endfor %}
+{% endfor %}
 </table>
