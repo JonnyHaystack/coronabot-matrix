@@ -1,10 +1,11 @@
 import asyncio
-import shlex
 from datetime import datetime
 from json import JSONDecodeError
 
 from nio import AsyncClient
 from nio import RoomMessageText
+from nio import MatrixRoom
+from nio import InviteEvent
 
 from coronabot import data
 from coronabot import formatting
@@ -21,12 +22,16 @@ class Bot:
             "cbstats": self.cbstats,
         }
         self.client.add_event_callback(self.message_handler, RoomMessageText)
+        self.client.add_event_callback(self.invite_handler, InviteEvent)
 
     async def run(self):
         await self.client.login(settings.MATRIX_PASSWORD)
         await self.client.sync_forever(timeout=30000)
 
-    async def message_handler(self, room, event):
+    async def invite_handler(self, room: MatrixRoom, event: InviteEvent):
+        await self.client.join(room.room_id)
+
+    async def message_handler(self, room, event: RoomMessageText):
         # Set up command handlers
         args = event.body.split(" ")
         if len(args) > 0 and args[0].startswith("!"):
